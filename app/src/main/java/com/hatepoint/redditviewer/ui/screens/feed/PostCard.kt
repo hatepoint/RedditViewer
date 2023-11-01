@@ -28,13 +28,13 @@ data class Publication(
     val author: String,
     val date: Date,
     val commentsCount: Int,
-    val imageUrl: String?,
+    val imageUrl: String,
     val postContent: String
 )
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PostCard(publication: Publication) {
+fun PostCard(publication: Publication, onSaveImageClick: (String, String) -> Unit) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
 
@@ -86,12 +86,29 @@ fun PostCard(publication: Publication) {
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        Text(
-            text = "Comments: ${publication.commentsCount}",
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        Row() {
+            Text(
+                text = "Comments: ${publication.commentsCount}",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .weight(1f)
+            )
+            Text(
+                text = "Save to gallery",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .clickable {
+                        onSaveImageClick(
+                            publication.imageUrl,
+                            "${publication.author}_${publication.date}.jpg"
+                        )
+                    }
+            )
+        }
     }
 }
 
@@ -105,5 +122,5 @@ fun PublicationCardPreview() {
         imageUrl = "https://commons.wikimedia.org/wiki/File:Wikipedia-logo-v2.svg",
         postContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     )
-    PostCard(publication = samplePublication)
+    PostCard(publication = samplePublication, onSaveImageClick = { _, _ -> true })
 }

@@ -8,6 +8,6 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { RetrofitClient.retrofitClient }
-    single { RedditRepository(get()) }
+    single { RedditRepository(get(), get()) }
     viewModel { FeedViewModel(get()) }
 }
