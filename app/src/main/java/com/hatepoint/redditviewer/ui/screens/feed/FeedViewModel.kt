@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class FeedViewModel(private val repository: RedditRepository): ViewModel() {
+class FeedViewModel(private val repository: RedditRepository) : ViewModel() {
     private val _uiState = MutableStateFlow<FeedState>(FeedState.Loading)
     val uiState: StateFlow<FeedState> = _uiState
     private val _snackbarState = MutableStateFlow("")
@@ -29,21 +29,19 @@ class FeedViewModel(private val repository: RedditRepository): ViewModel() {
     }
 
     fun getTopPosts(after: String, limit: Int): Flow<FeedState> = flow {
-        try{
-            viewModelScope.launch {
-                _uiState.value = FeedState.Loading
-                val response = repository.getTopPosts(after, limit)
-                if (response.isSuccessful) {
-                    Log.d("FeedViewModel", "Success: ${response.body()!!.data.children}")
-                    val posts = mutableListOf<DataX>()
-                    response.body()!!.data.children.forEach { post ->
-                        posts.add(post.data)
-                    }
-                    _uiState.value = FeedState.Success(posts, "")
-                } else {
-                    Log.d("FeedViewModel", "Error: ${response.message()}")
-                    _uiState.value = FeedState.Error(response.message())
+        try {
+            _uiState.value = FeedState.Loading
+            val response = repository.getTopPosts(after, limit)
+            if (response.isSuccessful) {
+                Log.d("FeedViewModel", "Success: ${response.body()!!.data.children}")
+                val posts = mutableListOf<DataX>()
+                response.body()!!.data.children.forEach { post ->
+                    posts.add(post.data)
                 }
+                _uiState.value = FeedState.Success(posts, "")
+            } else {
+                Log.d("FeedViewModel", "Error: ${response.message()}")
+                _uiState.value = FeedState.Error(response.message())
             }
         } catch (e: Exception) {
             Log.d("FeedViewModel", "Error: ${e.message}")
@@ -59,7 +57,8 @@ class FeedViewModel(private val repository: RedditRepository): ViewModel() {
                     author = post.author,
                     date = Date(post.created.toInt() * 1000L),
                     commentsCount = post.num_comments,
-                    imageUrl = post.preview?.images?.get(0)?.resolutions?.last()?.url ?: post.thumbnail,
+                    imageUrl = post.preview?.images?.get(0)?.resolutions?.last()?.url
+                        ?: post.thumbnail,
                     postContent = post.title
                 )
             )
